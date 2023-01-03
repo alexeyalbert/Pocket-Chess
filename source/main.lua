@@ -113,7 +113,6 @@ local function setup()
 
 	spriteSetup(wKing)
 
-	--wPawnA2:moveTo(boardCoords["aX"] , boardCoords["2Y"])
 	wPawnA2:moveTo(boardCoords["aX"], boardCoords["2Y"])
 	wPawnB2:moveTo(boardCoords["bX"], boardCoords["2Y"])
 	wPawnC2:moveTo(boardCoords["cX"], boardCoords["2Y"])
@@ -158,7 +157,7 @@ local function setup()
 
 	wKing:add()
 
-	--coords of where theyre supposed(???) to be
+	--coords of where theyre supposed(???) to be (this might become necessary once the pieces are moved around the board by the players.)
 	selectorPos = {}
 	selectorPos[1] = selectorSprite.x
 	selectorPos[2] = selectorSprite.y
@@ -167,6 +166,7 @@ local function setup()
 	wPawnA2Pos[1] = wPawnA2.x
 	wPawnA2Pos[2] = wPawnA2.y
 
+	--position details
 	defaultBoardToPieceDistance_selectorPos = backgroundSprite.y - selectorSprite.y
 	defaultBoardToPieceDistance_wPawnA2Pos = backgroundSprite.y - wPawnA2.y
 	defaultBoardToPieceDistance_wPawnB2Pos = backgroundSprite.y - wPawnB2.y
@@ -190,6 +190,7 @@ local function setup()
 
 	defaultBoardToPieceDistance_wKingPos = backgroundSprite.y - wKing.y
 
+	--selector menu item
 	menu = playdate.getSystemMenu()
 
 	local menuItem, error = menu:addMenuItem("selector", selector)
