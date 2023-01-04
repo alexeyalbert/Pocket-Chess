@@ -1,6 +1,6 @@
 name=Pocket Chess
 author=Alexey Albert
-description=Its chess.
+description=A simple chess game
 bundleID=com.organization.package
 version=0.0.1
 buildNumber=1
