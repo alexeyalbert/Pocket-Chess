@@ -6,6 +6,7 @@ import "CoreLibs/timer"
 local gfx <const> = playdate.graphics
 local safeMode = playdate.getReduceFlashing()
 
+--chess board coord shortcuts
 boardCoords = {}
 boardCoords["a"] = 0
 boardCoords["b"] = 50
@@ -24,6 +25,7 @@ boardCoords["6"] = -250
 boardCoords["7"] = -300
 boardCoords["8"] = -350
 
+--chess piece object/class
 class('piece').extends(gfx.sprite)
 
 function piece:init(column, row, image, color)
@@ -34,14 +36,11 @@ function piece:init(column, row, image, color)
     self.color = color
 	self.posX = self.x
 	self.posY = self.y
-end
-
-local function selector()
-	selectorSprite:add()
+	self.pos = self.x .. " " .. self.y
 end
 
 --setup func
-local function setup()
+local function init()
 	gfx.setDrawOffset(0, 240)
 
 	--selector
@@ -50,6 +49,7 @@ local function setup()
 	selectorSprite:moveTo(boardCoords["a"], boardCoords["2"])
 	selectorSprite:setZIndex(2)
 	selectorSprite:setCenter(0, 1)
+	selectorSprite:add()
 
 	--board sprite
 	backgroundImage = gfx.image.new("images/background")
@@ -120,20 +120,19 @@ local function setup()
 
 	wKingE = piece("e", "1", wKingImage, "white")
 	wKingE:add()
-	--coords of where theyre supposed(???) to be (this might become necessary once the pieces are moved around the board by the players.)
-	selectorPos = {}
-	selectorPos[1] = selectorSprite.x
-	selectorPos[2] = selectorSprite.y
-	
-	--[[wPawnA2Pos = {}
-	wPawnA2Pos[1] = wPawnA2.x
-	wPawnA2Pos[2] = wPawnA2.y
---]]
 
-	--selector menu item
-	menu = playdate.getSystemMenu()
+	selDotImage = gfx.image.new("images/selDot")
+	class('selDots').extends(gfx.sprite)
 
-	local menuItem, error = menu:addMenuItem("selector", selector)
+	function selDots:init(relPosX, relPosY)
+		self:setImage(selDotImage)
+	    self:setZIndex(1)
+	    self:setCenter(0.0, 1.0)
+	    self:moveTo(selectorSprite.x + relPosX, selectorSprite.y + relPosY)
+	    self.relPosX = relPosX
+	    self.relPosY = relPosY
+	    self.relPos = relPosX .. " " .. relPosY
+	end
 
 end
 
@@ -169,41 +168,61 @@ function scrollBoard()
 
 end	
 
+--movement of the selector sprite
 local function selectorMovement()
 	if playdate.buttonIsPressed(playdate.kButtonUp) then
 		if playdate.buttonJustPressed(playdate.kButtonUp) == true then
-			selectorSprite:moveBy(0, -50)
-			defaultBoardToPieceDistance_selectorPos = backgroundSprite.y - selectorSprite.y
+			if selectorSprite.y ~= -350 then
+				selectorSprite:moveBy(0, -50)
+			end
 		end
 	end
 
 	if playdate.buttonIsPressed(playdate.kButtonDown) then
 		if playdate.buttonJustPressed(playdate.kButtonDown) == true then
-			selectorSprite:moveBy(0, 50)
-			defaultBoardToPieceDistance_selectorPos = backgroundSprite.y - selectorSprite.y
+			if selectorSprite.y ~= 0 then
+				selectorSprite:moveBy(0, 50)
+			end
 		end
-		
 	end
 
 	if playdate.buttonIsPressed(playdate.kButtonLeft) then
 		if playdate.buttonJustPressed(playdate.kButtonLeft) == true then
-			selectorSprite:moveBy(-50, 0)
+			if selectorSprite.x ~= 0 then
+				selectorSprite:moveBy(-50, 0)
+			end
 		end
 	end
 
 	if playdate.buttonIsPressed(playdate.kButtonRight) then
 		if playdate.buttonJustPressed(playdate.kButtonRight) == true then
-			selectorSprite:moveBy(50, 0)	
+			if selectorSprite.x ~= 350 then
+				selectorSprite:moveBy(50, 0)	
+			end
 		end
 	end
 end
 
---why even make setup a function if theres only one thing to call at launch and you only call it once ?
-setup()
+function playdate.AButtonDown()
+	local selectorPos = selectorSprite.x .. " " .. selectorSprite.y
+	if wPawnA.pos == selectorPos then
+		dot1 = selDots(0, -50)
+		dot1:add()
+		dot2 = selDots(0, -100)
+		dot2:add()
+	elseif wPawnB.pos == selectorPos then
+		dot1 = selDots(0, -50)
+		dot1:add()
+		dot2 = selDots(0, -100)
+		dot2:add()
+	end
+end
+
+
+init()
 
 --update display update
 function playdate.update()
-
 	gfx.sprite.update()
 
 	scrollBoard()
