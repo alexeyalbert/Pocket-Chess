@@ -41,6 +41,11 @@ end
 
 --setup func
 local function init()
+
+	selDots = nil
+	dot1 = nil
+	dot2 = nil
+
 	gfx.setDrawOffset(0, 240)
 
 	--selector
@@ -134,6 +139,7 @@ local function init()
 	    self.relPos = relPosX .. " " .. relPosY
 	end
 
+	APressedYet = false
 end
 
 --scrolling along using the crank
@@ -205,6 +211,10 @@ end
 
 function playdate.AButtonDown()
 	local selectorPos = selectorSprite.x .. " " .. selectorSprite.y
+	if APressedYet then
+		dot1:remove()
+		dot2:remove()
+	end
 	if wPawnA.pos == selectorPos then
 		dot1 = selDots(0, -50)
 		dot1:add()
@@ -216,6 +226,7 @@ function playdate.AButtonDown()
 		dot2 = selDots(0, -100)
 		dot2:add()
 	end
+	APressedYet = true
 end
 
 
