@@ -7,7 +7,7 @@ local gfx <const> = playdate.graphics
 local safeMode = playdate.getReduceFlashing()
 
 --chess board coord shortcuts
-boardCoords = {}
+local boardCoords = {}
 boardCoords["a"] = 0
 boardCoords["b"] = 50
 boardCoords["c"] = 100
@@ -28,6 +28,11 @@ boardCoords["8"] = -350
 --chess piece object/class
 class('piece').extends(gfx.sprite)
 
+--some vars i'll need later
+local APressedYet = false
+local dot = {}
+local piecePosTable = {}
+
 function piece:init(column, row, image, color)
     self:setImage(image)
     self:moveTo(boardCoords[column], boardCoords[row])
@@ -37,6 +42,7 @@ function piece:init(column, row, image, color)
 	self.posX = self.x
 	self.posY = self.y
 	self.pos = self.x .. " " .. self.y
+	piecePosTable[self] = self.pos
 end
 
 --setup func
@@ -139,7 +145,7 @@ local function init()
 	    self.relPos = relPosX .. " " .. relPosY
 	end
 
-	APressedYet = false
+
 end
 
 --scrolling along using the crank
@@ -209,22 +215,39 @@ local function selectorMovement()
 	end
 end
 
+local function pawnMovementPreview()
+	for i = 1, 2 do
+		local posYUp = i * -50
+		dot[i] = selDots(0, posYUp)
+		dot[i]:add()
+	end
+end
+
+
 function playdate.AButtonDown()
 	local selectorPos = selectorSprite.x .. " " .. selectorSprite.y
 	if APressedYet then
-		dot1:remove()
-		dot2:remove()
+		for k, v in pairs(dot) do
+			dot[k]:remove()
+		end
 	end
-	if wPawnA.pos == selectorPos then
-		dot1 = selDots(0, -50)
-		dot1:add()
-		dot2 = selDots(0, -100)
-		dot2:add()
-	elseif wPawnB.pos == selectorPos then
-		dot1 = selDots(0, -50)
-		dot1:add()
-		dot2 = selDots(0, -100)
-		dot2:add()
+
+	if selectorPos == wPawnA.pos or wPawnB.pos == selectorPos or wPawnC.pos == selectorPos or wPawnD.pos == selectorPos or wPawnE.pos == selectorPos or wPawnF.pos == selectorPos or wPawnG.pos == selectorPos or wPawnH.pos == selectorPos then
+		pawnMovementPreview()
+	elseif wPawnH.pos == selectorPos then
+		pawnMovementPreview()
+	elseif wRookA.pos == selectorPos then
+		--if wRookA.x == 0 then 
+		
+		--[[note to self, limit the drawing of preview dots based 
+		on their pos to make sure dots aren't unnecesarily drawn offscreen--]]
+
+		for i = 1, 8 do
+			local posYUp = i * -50
+			dot[i] = selDots(0, posYUp)
+			dot[i]:add()
+		end
+
 	end
 	APressedYet = true
 end
@@ -241,4 +264,6 @@ function playdate.update()
 	selectorMovement()
 	
 	playdate.drawFPS(0, 0)
+
+print("hello!")
 end
